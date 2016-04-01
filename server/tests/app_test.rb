@@ -30,4 +30,7 @@ class AppTest < Minitest::Test
     response = JSON.parse(response.body)
     assert_equal response.has_key?("token"), true
   end
+
+  def test_password_can_be_saved_in_database
+  end
 end

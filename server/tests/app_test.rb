@@ -22,4 +22,13 @@ class AppTest < Minitest::Test
     payload = JSON.parse(response.body)
     assert_equal(hash, payload)
   end
+
+  def test_login_works_without_password
+    hash = {}
+
+    response = post("/login", hash.to_json, { "CONTENT_TYPE" => "application/json" })
+
+    assert response.ok?
+    assert "Welcome!", response.body.to_s
+  end
 end

@@ -17,18 +17,17 @@ class AppTest < Minitest::Test
     # hash is body of the request
     hash = { "name" => "bob" }
     response = post("/backend/echo", hash.to_json, { "CONTENT_TYPE" => "application/json" })
-
     assert response.ok?
     payload = JSON.parse(response.body)
     assert_equal(hash, payload)
   end
 
-  def test_login_works_without_password
+  def test_login_generates_random_token
     hash = {}
-
     response = post("/login", hash.to_json, { "CONTENT_TYPE" => "application/json" })
-
     assert response.ok?
-    assert "Welcome!", response.body.to_s
+
+    response = JSON.parse(response.body)
+    assert_equal response.has_key?("token"), true
   end
 end

@@ -14,6 +14,7 @@ class AppTest < Minitest::Test
   end
 
   def test_backend_echo_endpoint_will_return_exact_msg_back
+    # hash is body of the request
     hash = { "name" => "bob" }
     response = post("/backend/echo", hash.to_json, { "CONTENT_TYPE" => "application/json" })
 

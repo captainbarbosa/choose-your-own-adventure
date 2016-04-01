@@ -8,6 +8,7 @@ class StepMigration < ActiveRecord::Migration
       t.boolean :start
       t.boolean :end
       t.text :text
+      t.integer :adventure_id
     end
   end
 

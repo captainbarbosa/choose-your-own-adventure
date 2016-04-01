@@ -19,8 +19,8 @@ ActiveRecord::Schema.define(version: 3) do
   create_table "adventures", force: :cascade do |t|
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.integer  "step_id"
     t.string   "adventure_name"
+    t.integer  "user_id"
   end
 
   create_table "steps", force: :cascade do |t|
@@ -30,13 +30,13 @@ ActiveRecord::Schema.define(version: 3) do
     t.boolean  "start"
     t.boolean  "end"
     t.text     "text"
+    t.integer  "adventure_id"
   end
 
   create_table "users", force: :cascade do |t|
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string   "token"
-    t.integer  "adventure_id"
   end
 
 end

@@ -1,3 +1,5 @@
-class Step < ActiveRecord::Base
-  belongs_to :adventure
+module Adventure
+  class Step < ActiveRecord::Base
+    belongs_to :adventure
+  end
 end

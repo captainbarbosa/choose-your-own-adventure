@@ -15,13 +15,24 @@
  */
 if (window.location.search.match(/[^a-z]debug([^a-z]|$)/i)) {
 
-    // Create a new story
+    // Login
     $.mockjax({
       url: '/login', // What should this be? Negotiate it!
       type: 'POST',             // This is the HTTP method for this action
       proxy: 'test/json/login.json'
     });
-
+    // Create a new story
+    $.mockjax({
+      url: '/new_adventure', // What should this be? Negotiate it!
+      type: 'POST',             // This is the HTTP method for this action
+      proxy: 'test/json/new_adventure.json'
+    });
+    //
+    //
+    //
+    //
+    //
+    //
     // // Retrieve a story
     // $.mockjax({
     //   url: '/where/is/it',

@@ -1,10 +1,8 @@
 (function(codeYourAdv) {
   'use strict';
-
-  var userToken = {};
-
   codeYourAdv = codeYourAdv || (window.codeYourAdv = {});
 
+  codeYourAdv.userToken = {};
   // login event
 
   $('#login form').on('submit', function (event){
@@ -16,23 +14,20 @@
     $.ajax({
       url: '/login',
       type: 'POST',
-      dataType: 'JSON',
+      dataType: 'json',
       contentType: 'application/json',
       success: function getToken (data){
-        userToken.token = data.token;
-        console.log(userToken.token);
+        codeYourAdv.userToken.token = data.token;
         $('#login').hide();
         $('nav, #story-list').css( "display", "block");
-        console.log( userToken);
+        console.log( codeYourAdv.userToken);
 
-        // create error, update success, variable to store tokens
-
-      }
-
+      },
+      error: function loginError (xhr){
+        console.error(xhr);      }
     });
 
   });
 
-  // json.parse
 
 })(window.codeYourAdv);

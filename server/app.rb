@@ -5,8 +5,9 @@ require "bundler/setup"
 require "sinatra"
 require "json"
 require "pry"
+require_relative 'lib/adventure'
 
-require_relative "lib/adventure"
+## DATA IS SAVED TO PRODUCTION DB
 
 set :static, true
 set :public_folder, Proc.new { File.join(root, "..", "client") }
@@ -36,5 +37,6 @@ end
 
 post "/login" do
   token = SecureRandom.hex
-  {token: token}.to_json
+  user = Adventure::User.create(token: token)
+  {token: user.token}.to_json
 end

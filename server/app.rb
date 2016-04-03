@@ -43,10 +43,10 @@ end
 
 post "/new_adventure" do
   client_token = request.env["HTTP_AUTHORIZATION"]
+  user = Adventure::User.where(token: client_token).first
 
-  if Adventure::User.exists?(token: client_token)
+  if user != nil
     body = JSON.parse(request.body.read)
-    user = Adventure::User.find_by token: client_token
     adventure = Adventure::Adventure.create(body)
     user.adventures << adventure
     adventure.to_json

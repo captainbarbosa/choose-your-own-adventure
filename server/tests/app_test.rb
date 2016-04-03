@@ -32,15 +32,29 @@ class AppTest < Minitest::Test
     assert_equal response.has_key?("token"), true
   end
 
-  def test_new_adventure_endpoint # Doesnt work properly
+  def test_new_adventure_endpoint_with_token
+    # Retrieve login token to use in the second POST request
     init_hash = {}
-    get_response = post("/login", init_hash.to_json, { "CONTENT_TYPE" => "application/json" })
-    body = JSON.parse(get_response.body)
+    login_response = post("/login", init_hash.to_json, { "CONTENT_TYPE" => "application/json" })
+    body = JSON.parse(login_response.body)
 
+    # Add token to header for the following POST request
+    header("AUTHORIZATION", body["token"])
+    header("CONTENT_TYPE", "application/json")
     hash = { "adventure_name" => "A day at the beach" }
-    # Need to pass this POST request with a token in header
-    post_response = post("/new_adventure", hash.to_json, { "CONTENT_TYPE" => "application/json" })
-    post_response.headers["HTTP_AUTHORIZATION"] = body["token"]
-    binding.pry
+    new_adventure_response = post("/new_adventure", hash.to_json)
+    new_adventure = JSON.parse(new_adventure_response.body)
+
+    assert_equal true, new_adventure.has_key?("id")
   end
+
+  def test_new_adventure_endpoint_with_invalid_token
+    # Token is made up and does not match the one issued from POST /login
+    header("AUTHORIZATION", 12345678)
+    new_adventure_response = post("/new_adventure", hash.to_json)
+    response = JSON.parse(new_adventure_response.body)
+
+    assert_equal "User token invalid", response["msg"]
+  end
+
 end

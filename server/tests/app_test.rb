@@ -236,6 +236,6 @@ class AppTest < Minitest::Test
     response = get("/all_steps/#{adventure_id}")
     steps = JSON.parse(response.body)
 
-    asset_equal [], steps
+    assert_equal [], steps
   end
 end

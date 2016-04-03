@@ -104,3 +104,28 @@ patch "/adventure/:id" do
      halt 401, {msg: "User token invalid"}.to_json
   end
 end
+
+patch "/adventure/:id/:step_id" do
+  client_token = request.env["HTTP_AUTHORIZATION"]
+  user = Adventure::User.where(token: client_token).first
+
+  if user != nil
+    payload = JSON.parse(request.body.read)
+    adventure = Adventure::Adventure.where(id: ":id").first
+    step = Adventure::Step.find(params["step_id"]).update(payload).to_json
+  else
+     halt 401, {msg: "User token invalid"}.to_json
+  end
+end
+
+delete "/adventure/:id" do
+  client_token = request.env["HTTP_AUTHORIZATION"]
+  user = Adventure::User.where(token: client_token).first
+
+  if user != nil
+    adventure = Adventure::Adventure.find(params["id"]).destroy
+    adventure.to_json
+  else
+     halt 401, {msg: "User token invalid"}.to_json
+  end
+end

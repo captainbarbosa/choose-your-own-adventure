@@ -174,4 +174,58 @@ class AppTest < Minitest::Test
     assert_equal "true", updated_adventure_response.body
   end
 
+  def test_step_can_be_updated
+    # Issue unique login token
+    init_hash = {}
+    login_response = post("/login", init_hash.to_json, { "CONTENT_TYPE" => "application/json" })
+    body = JSON.parse(login_response.body)
+
+    # Make adventure, authorize with login token
+    header("AUTHORIZATION", body["token"])
+    header("CONTENT_TYPE", "application/json")
+    hash = { "adventure_name" => "Get abducted by aliens" }
+    adventure_response = post("/new_adventure", hash.to_json)
+    adventure = JSON.parse(adventure_response.body)
+    adventure_id = adventure["id"]
+
+    # Make step, authorize with login token
+    header("AUTHORIZATION", body["token"])
+    header("CONTENT_TYPE", "application/json")
+    hash = { "name" => "Take the blue pill" }
+    step_response = post("/new_step", hash.to_json)
+    step = JSON.parse(step_response.body)
+    step_id = step["id"]
+
+    # Patch step to have a new name
+    header("AUTHORIZATION", body["token"])
+    header("CONTENT_TYPE", "application/json")
+    hash = { "name" => "Take the red pill" }
+    updated_step_response = patch("/adventure/#{adventure_id}/#{step_id}", hash.to_json)
+
+    assert_equal "true", updated_step_response.body
+  end
+
+  def test_adventure_can_be_deleted
+    # Issue unique login token
+    init_hash = {}
+    login_response = post("/login", init_hash.to_json, { "CONTENT_TYPE" => "application/json" })
+    body = JSON.parse(login_response.body)
+
+    # Make adventure, authorize with login token
+    header("AUTHORIZATION", body["token"])
+    header("CONTENT_TYPE", "application/json")
+    hash = { "adventure_name" => "Climb into a volcano" }
+    adventure_response = post("/new_adventure", hash.to_json)
+    adventure = JSON.parse(adventure_response.body)
+    adventure_id = adventure["id"]
+    binding.pry
+    # Delete adventure
+    delete_adventure_response = delete("/adventure/#{adventure_id}")
+
+    response = get("/adventures")
+    adventures = JSON.parse(response.body)
+
+    assert_equal [], adventures
+  end
+
 end

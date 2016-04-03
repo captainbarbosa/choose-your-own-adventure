@@ -8,7 +8,9 @@ class StepMigration < ActiveRecord::Migration
       t.boolean :start
       t.boolean :end
       t.text :optionA
+      t.integer :optionA_step
       t.text :optionB
+      t.integer :optionB_step
       t.text :text
       t.integer :adventure_id
     end

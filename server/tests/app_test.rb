@@ -186,8 +186,8 @@ class AppTest < Minitest::Test
     # Add token to header & retrieve a single step
     response = get("/adventure/#{adventure_id}/#{step_id}")
     step = JSON.parse(response.body)
-
-    assert_equal 10, step.length
+    
+    assert_equal 12, step.length
   end
 
   def test_multiple_steps_can_be_listed

@@ -8,22 +8,7 @@ class AppTest < Minitest::Test
     Sinatra::Application
   end
 
-  # def test_declares_its_name
-  #   response = get "/backend"
-  #   assert response.ok?
-  #   assert_equal "I am Groot!", response.body
-  # end
-
-  def test_backend_echo_endpoint_will_return_exact_msg_back
-    # hash is body of the request
-    hash = { "name" => "bob" }
-    response = post("/backend/echo", hash.to_json, { "CONTENT_TYPE" => "application/json" })
-    assert response.ok?
-    payload = JSON.parse(response.body)
-    assert_equal(hash, payload)
-  end
-
-  def test_login_endpoint
+  def test_can_get_login_token
     hash = {}
     response = post("/login", hash.to_json, { "CONTENT_TYPE" => "application/json" })
     assert response.ok?
@@ -32,13 +17,22 @@ class AppTest < Minitest::Test
     assert_equal response.has_key?("token"), true
   end
 
-  def test_new_adventure_endpoint_with_token
-    # Retrieve login token to use in the second POST request
+  def test_endpoints_will_not_work_with_invalid_token
+    # Occurs if login token does not match the one issued from POST /login
+    header("AUTHORIZATION", 12345678)
+    new_adventure_response = post("/new_adventure", hash.to_json)
+    response = JSON.parse(new_adventure_response.body)
+
+    assert_equal "User token invalid", response["msg"]
+  end
+
+  def test_new_adventure_endpoint
+    # Get login token
     init_hash = {}
     login_response = post("/login", init_hash.to_json, { "CONTENT_TYPE" => "application/json" })
     body = JSON.parse(login_response.body)
 
-    # Add token to header for the following POST request
+    # Add token to header & create a new adventure
     header("AUTHORIZATION", body["token"])
     header("CONTENT_TYPE", "application/json")
     hash = { "adventure_name" => "A day at the beach" }
@@ -48,29 +42,20 @@ class AppTest < Minitest::Test
     assert_equal true, new_adventure.has_key?("id")
   end
 
-  def test_new_adventure_endpoint_with_invalid_token
-    # Token is made up and does not match the one issued from POST /login
-    header("AUTHORIZATION", 12345678)
-    new_adventure_response = post("/new_adventure", hash.to_json)
-    response = JSON.parse(new_adventure_response.body)
-
-    assert_equal "User token invalid", response["msg"]
-  end
-
   def test_new_step_endpoint
-    # Issue unique login token
+    # Get login token
     init_hash = {}
     login_response = post("/login", init_hash.to_json, { "CONTENT_TYPE" => "application/json" })
     body = JSON.parse(login_response.body)
 
-    # Make adventure, authorize with login token
+    # Add token to header & create a new adventure
     header("AUTHORIZATION", body["token"])
     header("CONTENT_TYPE", "application/json")
     hash = { "adventure_name" => "Winning the lottery" }
     new_adventure_response = post("/new_adventure", hash.to_json)
     new_adventure = JSON.parse(new_adventure_response.body)
 
-    # Make step, authorize with login token
+    # Add token to header & create a new step
     header("AUTHORIZATION", body["token"])
     header("CONTENT_TYPE", "application/json")
     hash = { "name" => "Buy an island" }
@@ -81,43 +66,34 @@ class AppTest < Minitest::Test
     assert_equal new_adventure["id"], new_step["adventure_id"]
   end
 
-  def test_new_step_endpoint_with_invalid_token
-    # Token is made up and does not match the one issued from POST /login
-    header("AUTHORIZATION", 12345678)
-    new_step_response = post("/new_step", hash.to_json)
-    response = JSON.parse(new_step_response.body)
-
-    assert_equal "User token invalid", response["msg"]
-  end
-
   def test_can_list_all_steps_belonging_to_an_adventure
-    # Issue unique login token
+    # Get login token
     init_hash = {}
     login_response = post("/login", init_hash.to_json, { "CONTENT_TYPE" => "application/json" })
     body = JSON.parse(login_response.body)
 
-    # Make adventure, authorize with login token
+    # Add token to header & create a new adventure
     header("AUTHORIZATION", body["token"])
     header("CONTENT_TYPE", "application/json")
     hash = { "adventure_name" => "Find a time machine" }
     new_adventure_response = post("/new_adventure", hash.to_json)
     new_adventure = JSON.parse(new_adventure_response.body)
 
-    # Make first step, authorize with login token
+    # Add token to header & create a new first step
     header("AUTHORIZATION", body["token"])
     header("CONTENT_TYPE", "application/json")
     hash = { "name" => "Go to the future" }
     first_step_response = post("/new_step", hash.to_json)
     first_step = JSON.parse(first_step_response.body)
 
-    # Make second step, authorize with login token
+    # Add token to header & create a new second step
     header("AUTHORIZATION", body["token"])
     header("CONTENT_TYPE", "application/json")
     hash = { "name" => "Go to the past" }
     second_step_response = post("/new_step", hash.to_json)
     second_step = JSON.parse(second_step_response.body)
 
-    # Add above two steps to the adventure
+    # List steps belonging to the adventure
     adventure_id = new_adventure["id"]
     response = get("/all_steps/#{adventure_id}")
     steps = JSON.parse(response.body)
@@ -126,25 +102,26 @@ class AppTest < Minitest::Test
   end
 
   def test_can_retrieve_users_adventures
-    # Issue unique login token
+    # Get login token
     init_hash = {}
     login_response = post("/login", init_hash.to_json, { "CONTENT_TYPE" => "application/json" })
     body = JSON.parse(login_response.body)
 
-    # Make first adventure, authorize with login token
+    # Add token to header & create a first new adventure
     header("AUTHORIZATION", body["token"])
     header("CONTENT_TYPE", "application/json")
     hash = { "adventure_name" => "Go to an all-you-can-eat buffet" }
     first_adventure_response = post("/new_adventure", hash.to_json)
     first_adventure = JSON.parse(first_adventure_response.body)
 
-    # Make second adventure, authorize with login token
+    # Add token to header & create a second new adventure
     header("AUTHORIZATION", body["token"])
     header("CONTENT_TYPE", "application/json")
     hash = { "adventure_name" => "Climb Mt. Everest" }
     second_adventure_response = post("/new_adventure", hash.to_json)
     second_adventure = JSON.parse(second_adventure_response.body)
 
+    # List adventures belonging to user
     response = get("/adventures")
     adventures = JSON.parse(response.body)
 
@@ -152,12 +129,12 @@ class AppTest < Minitest::Test
   end
 
   def test_adventure_can_be_updated
-    # Issue unique login token
+    # Get login token
     init_hash = {}
     login_response = post("/login", init_hash.to_json, { "CONTENT_TYPE" => "application/json" })
     body = JSON.parse(login_response.body)
 
-    # Make adventure, authorize with login token
+    # Add token to header & create a new adventure
     header("AUTHORIZATION", body["token"])
     header("CONTENT_TYPE", "application/json")
     hash = { "adventure_name" => "My old adventure" }
@@ -165,7 +142,7 @@ class AppTest < Minitest::Test
     adventure = JSON.parse(adventure_response.body)
     adventure_id = adventure["id"]
 
-    # Patch adventure to have a new name
+    # Update adventure to have a new name
     header("AUTHORIZATION", body["token"])
     header("CONTENT_TYPE", "application/json")
     hash = { "adventure_name" => "My new adventure" }
@@ -175,12 +152,12 @@ class AppTest < Minitest::Test
   end
 
   def test_step_can_be_updated
-    # Issue unique login token
+    # Get login token
     init_hash = {}
     login_response = post("/login", init_hash.to_json, { "CONTENT_TYPE" => "application/json" })
     body = JSON.parse(login_response.body)
 
-    # Make adventure, authorize with login token
+    # Add token to header & create a new adventure
     header("AUTHORIZATION", body["token"])
     header("CONTENT_TYPE", "application/json")
     hash = { "adventure_name" => "Get abducted by aliens" }
@@ -188,7 +165,7 @@ class AppTest < Minitest::Test
     adventure = JSON.parse(adventure_response.body)
     adventure_id = adventure["id"]
 
-    # Make step, authorize with login token
+    # Add token to header & create a new step
     header("AUTHORIZATION", body["token"])
     header("CONTENT_TYPE", "application/json")
     hash = { "name" => "Take the blue pill" }
@@ -206,26 +183,59 @@ class AppTest < Minitest::Test
   end
 
   def test_adventure_can_be_deleted
-    # Issue unique login token
+    # Get login token
     init_hash = {}
     login_response = post("/login", init_hash.to_json, { "CONTENT_TYPE" => "application/json" })
     body = JSON.parse(login_response.body)
 
-    # Make adventure, authorize with login token
+    # Add token to header & create a new adventure
     header("AUTHORIZATION", body["token"])
     header("CONTENT_TYPE", "application/json")
     hash = { "adventure_name" => "Climb into a volcano" }
     adventure_response = post("/new_adventure", hash.to_json)
     adventure = JSON.parse(adventure_response.body)
     adventure_id = adventure["id"]
-    binding.pry
+
     # Delete adventure
     delete_adventure_response = delete("/adventure/#{adventure_id}")
 
+    # List adventures belonging to user
     response = get("/adventures")
     adventures = JSON.parse(response.body)
 
     assert_equal [], adventures
   end
 
+  def test_step_can_be_deleted
+    # Get login token
+    init_hash = {}
+    login_response = post("/login", init_hash.to_json, { "CONTENT_TYPE" => "application/json" })
+    body = JSON.parse(login_response.body)
+
+    # Add token to header & create a new adventure
+    header("AUTHORIZATION", body["token"])
+    header("CONTENT_TYPE", "application/json")
+    hash = { "adventure_name" => "Become a fish" }
+    adventure_response = post("/new_adventure", hash.to_json)
+    adventure = JSON.parse(adventure_response.body)
+    adventure_id = adventure["id"]
+
+    # Add token to header & create a new step
+    header("AUTHORIZATION", body["token"])
+    header("CONTENT_TYPE", "application/json")
+    hash = { "name" => "Get eaten by a shark" }
+    step_response = post("/new_step", hash.to_json)
+    step = JSON.parse(step_response.body)
+    step_id = step["id"]
+
+
+    # Delete step
+    delete_step_response = delete("/adventure/#{adventure_id}/#{step_id}")
+
+    # Get steps belonging to this adventure
+    response = get("/all_steps/#{adventure_id}")
+    steps = JSON.parse(response.body)
+
+    asset_equal [], steps
+  end
 end

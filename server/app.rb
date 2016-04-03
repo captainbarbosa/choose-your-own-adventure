@@ -129,3 +129,16 @@ delete "/adventure/:id" do
      halt 401, {msg: "User token invalid"}.to_json
   end
 end
+
+delete "/adventure/:id/:step_id" do
+  client_token = request.env["HTTP_AUTHORIZATION"]
+  user = Adventure::User.where(token: client_token).first
+
+  if user != nil
+    adventure = Adventure::Adventure.where(id: ":id").first
+    step = Adventure::Step.find(params["step_id"]).destroy
+    step.to_json
+  else
+     halt 401, {msg: "User token invalid"}.to_json
+  end
+end

@@ -125,4 +125,30 @@ class AppTest < Minitest::Test
     assert_equal 2, steps.length
   end
 
+  def test_can_retrieve_users_adventures
+    # Issue unique login token
+    init_hash = {}
+    login_response = post("/login", init_hash.to_json, { "CONTENT_TYPE" => "application/json" })
+    body = JSON.parse(login_response.body)
+
+    # Make first adventure, authorize with login token
+    header("AUTHORIZATION", body["token"])
+    header("CONTENT_TYPE", "application/json")
+    hash = { "adventure_name" => "Go to an all-you-can-eat buffet" }
+    first_adventure_response = post("/new_adventure", hash.to_json)
+    first_adventure = JSON.parse(first_adventure_response.body)
+
+    # Make second adventure, authorize with login token
+    header("AUTHORIZATION", body["token"])
+    header("CONTENT_TYPE", "application/json")
+    hash = { "adventure_name" => "Climb Mt. Everest" }
+    second_adventure_response = post("/new_adventure", hash.to_json)
+    second_adventure = JSON.parse(second_adventure_response.body)
+
+    response = get("/adventures")
+    adventures = JSON.parse(response.body)
+
+    assert_equal 2, adventures.length
+  end
+
 end

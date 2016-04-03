@@ -23,12 +23,23 @@ class AppTest < Minitest::Test
     assert_equal(hash, payload)
   end
 
-  def test_login_generates_random_token_generated_from_user
+  def test_login_endpoint
     hash = {}
     response = post("/login", hash.to_json, { "CONTENT_TYPE" => "application/json" })
     assert response.ok?
 
     response = JSON.parse(response.body)
     assert_equal response.has_key?("token"), true
+  end
+
+  def test_new_adventure_endpoint # Doesnt work properly
+    init_hash = {}
+    get_response = post("/login", init_hash.to_json, { "CONTENT_TYPE" => "application/json" })
+    body = JSON.parse(get_response.body)
+
+    hash = { "adventure_name" => "A day at the beach" }
+    # Need to pass this POST request with a token in header
+    post_response = post("/new_adventure", hash.to_json, { "CONTENT_TYPE" => "application/json" })
+    post_response.headers["HTTP_AUTHORIZATION"] = body["token"]
   end
 end

@@ -151,4 +151,27 @@ class AppTest < Minitest::Test
     assert_equal 2, adventures.length
   end
 
+  def test_adventure_can_be_updated
+    # Issue unique login token
+    init_hash = {}
+    login_response = post("/login", init_hash.to_json, { "CONTENT_TYPE" => "application/json" })
+    body = JSON.parse(login_response.body)
+
+    # Make adventure, authorize with login token
+    header("AUTHORIZATION", body["token"])
+    header("CONTENT_TYPE", "application/json")
+    hash = { "adventure_name" => "My old adventure" }
+    adventure_response = post("/new_adventure", hash.to_json)
+    adventure = JSON.parse(adventure_response.body)
+    adventure_id = adventure["id"]
+
+    # Patch adventure to have a new name
+    header("AUTHORIZATION", body["token"])
+    header("CONTENT_TYPE", "application/json")
+    hash = { "adventure_name" => "My new adventure" }
+    updated_adventure_response = patch("/adventure/#{adventure_id}", hash.to_json)
+
+    assert_equal "true", updated_adventure_response.body
+  end
+
 end

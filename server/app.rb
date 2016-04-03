@@ -92,3 +92,15 @@ get "/adventures" do
      halt 401, {msg: "User token invalid"}.to_json
   end
 end
+
+patch "/adventure/:id" do
+  client_token = request.env["HTTP_AUTHORIZATION"]
+  user = Adventure::User.where(token: client_token).first
+
+  if user != nil
+    payload = JSON.parse(request.body.read)
+    adventure = Adventure::Adventure.find(params["id"]).update(payload).to_json
+  else
+     halt 401, {msg: "User token invalid"}.to_json
+  end
+end

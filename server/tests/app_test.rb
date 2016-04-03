@@ -90,4 +90,39 @@ class AppTest < Minitest::Test
     assert_equal "User token invalid", response["msg"]
   end
 
+  def test_can_list_all_steps_belonging_to_an_adventure
+    # Issue unique login token
+    init_hash = {}
+    login_response = post("/login", init_hash.to_json, { "CONTENT_TYPE" => "application/json" })
+    body = JSON.parse(login_response.body)
+
+    # Make adventure, authorize with login token
+    header("AUTHORIZATION", body["token"])
+    header("CONTENT_TYPE", "application/json")
+    hash = { "adventure_name" => "Find a time machine" }
+    new_adventure_response = post("/new_adventure", hash.to_json)
+    new_adventure = JSON.parse(new_adventure_response.body)
+
+    # Make first step, authorize with login token
+    header("AUTHORIZATION", body["token"])
+    header("CONTENT_TYPE", "application/json")
+    hash = { "name" => "Go to the future" }
+    first_step_response = post("/new_step", hash.to_json)
+    first_step = JSON.parse(first_step_response.body)
+
+    # Make second step, authorize with login token
+    header("AUTHORIZATION", body["token"])
+    header("CONTENT_TYPE", "application/json")
+    hash = { "name" => "Go to the past" }
+    second_step_response = post("/new_step", hash.to_json)
+    second_step = JSON.parse(second_step_response.body)
+
+    # Add above two steps to the adventure
+    adventure_id = new_adventure["id"]
+    response = get("/all_steps/#{adventure_id}")
+    steps = JSON.parse(response.body)
+
+    assert_equal 2, steps.length
+  end
+
 end

@@ -69,3 +69,15 @@ post "/new_step" do
      halt 401, {msg: "User token invalid"}.to_json
   end
 end
+
+get "/all_steps/:id" do
+  client_token = request.env["HTTP_AUTHORIZATION"]
+  user = Adventure::User.where(token: client_token).first
+
+  if user != nil
+    adventure = Adventure::Adventure.where(user_id: user.id).first
+    adventure.steps.to_json
+  else
+     halt 401, {msg: "User token invalid"}.to_json
+  end
+end

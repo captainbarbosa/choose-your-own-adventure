@@ -57,7 +57,7 @@ class AppTest < Minitest::Test
     assert_equal "User token invalid", response["msg"]
   end
 
-  def test_new_adventure_can_be_retrieved
+  def test_new_step_endpoint
     # Issue unique login token
     init_hash = {}
     login_response = post("/login", init_hash.to_json, { "CONTENT_TYPE" => "application/json" })
@@ -81,7 +81,7 @@ class AppTest < Minitest::Test
     assert_equal new_adventure["id"], new_step["adventure_id"]
   end
 
-  def test_new_adventure_endpoint_with_invalid_token
+  def test_new_step_endpoint_with_invalid_token
     # Token is made up and does not match the one issued from POST /login
     header("AUTHORIZATION", 12345678)
     new_step_response = post("/new_step", hash.to_json)

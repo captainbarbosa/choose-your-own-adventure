@@ -29,6 +29,8 @@ ActiveRecord::Schema.define(version: 3) do
     t.string   "name"
     t.boolean  "start"
     t.boolean  "end"
+    t.text     "optionA"
+    t.text     "optionB"
     t.text     "text"
     t.integer  "adventure_id"
   end

@@ -58,7 +58,7 @@ class AppTest < Minitest::Test
     # Add token to header & create a new step
     header("AUTHORIZATION", body["token"])
     header("CONTENT_TYPE", "application/json")
-    hash = { "name" => "Buy an island" }
+    hash = { "name" => "Buy an island", "optionA" => "In the Bahamas", "optionB" => "In Fiji"}
     new_step_response = post("/new_step", hash.to_json)
     new_step = JSON.parse(new_step_response.body)
 

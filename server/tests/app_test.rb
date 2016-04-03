@@ -41,5 +41,6 @@ class AppTest < Minitest::Test
     # Need to pass this POST request with a token in header
     post_response = post("/new_adventure", hash.to_json, { "CONTENT_TYPE" => "application/json" })
     post_response.headers["HTTP_AUTHORIZATION"] = body["token"]
+    binding.pry
   end
 end

@@ -40,3 +40,17 @@ post "/login" do
   user = Adventure::User.create(token: token)
   {token: user.token}.to_json
 end
+
+post "/new_adventure" do
+  client_token = request.env["HTTP_AUTHORIZATION"]
+
+  if Adventure::User.exists?(token: client_token)
+    body = JSON.parse(request.body.read)
+    user = Adventure::User.find_by token: client_token
+    adventure = Adventure::Adventure.create(body)
+    user.adventures << adventure
+    adventure.to_json
+  else
+     halt 401, {msg: "User token invalid"}.to_json
+  end
+end

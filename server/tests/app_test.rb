@@ -57,4 +57,37 @@ class AppTest < Minitest::Test
     assert_equal "User token invalid", response["msg"]
   end
 
+  def test_new_adventure_can_be_retrieved
+    # Issue unique login token
+    init_hash = {}
+    login_response = post("/login", init_hash.to_json, { "CONTENT_TYPE" => "application/json" })
+    body = JSON.parse(login_response.body)
+
+    # Make adventure, authorize with login token
+    header("AUTHORIZATION", body["token"])
+    header("CONTENT_TYPE", "application/json")
+    hash = { "adventure_name" => "Winning the lottery" }
+    new_adventure_response = post("/new_adventure", hash.to_json)
+    new_adventure = JSON.parse(new_adventure_response.body)
+
+    # Make step, authorize with login token
+    header("AUTHORIZATION", body["token"])
+    header("CONTENT_TYPE", "application/json")
+    hash = { "name" => "Buy an island" }
+    new_step_response = post("/new_step", hash.to_json)
+    new_step = JSON.parse(new_step_response.body)
+
+    assert_equal "Buy an island", new_step["name"]
+    assert_equal new_adventure["id"], new_step["adventure_id"]
+  end
+
+  def test_new_adventure_endpoint_with_invalid_token
+    # Token is made up and does not match the one issued from POST /login
+    header("AUTHORIZATION", 12345678)
+    new_step_response = post("/new_step", hash.to_json)
+    response = JSON.parse(new_step_response.body)
+
+    assert_equal "User token invalid", response["msg"]
+  end
+
 end

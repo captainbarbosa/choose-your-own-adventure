@@ -54,3 +54,18 @@ post "/new_adventure" do
      halt 401, {msg: "User token invalid"}.to_json
   end
 end
+
+post "/new_step" do
+  client_token = request.env["HTTP_AUTHORIZATION"]
+  user = Adventure::User.where(token: client_token).first
+
+  if user != nil
+    adventure = Adventure::Adventure.where(user_id: user.id).first
+    body = JSON.parse(request.body.read)
+    step = Adventure::Step.create(body)
+    adventure.steps << step
+    step.to_json
+  else
+     halt 401, {msg: "User token invalid"}.to_json
+  end
+end

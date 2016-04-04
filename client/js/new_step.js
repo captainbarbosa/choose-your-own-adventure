@@ -38,44 +38,16 @@ $.ajax({
   success: function newStep (data){
     stepId = data;
     codeYourAdv.stepId = stepId;
+    codeYourAdv.newLiFunc();
+    $( ".create-story-step" ).append('<input>' ).attr({'type':'checkbox', 'class': 'end', 'value': true}).val('This is the last step');
     console.log(codeYourAdv.stepId);
 
-// function to display data in list item
-    $('#stepsList')
-    .append('<li>')
-    .find('li:last-child')
-    .append('<h4>')
-      .find('h4')
-        .text('Step : ' + codeYourAdv.stepId.step_id)
-        .end()
-      .append('<form>')
-        .find('form')
-        .attr('class', 'edit-story-step')
-        .append('<input>')
-          .find('input')
-          .attr({'type':'hidden', 'class': 'story-id', 'value':codeYourAdv.storyId.id})
-          .end()
-        .append('<fieldset>')
-          .find('fieldset')
-            .append('<h4>')
-              .find('h4')
-                .text('Step text:')
-                .end()
-        .append('<textarea>')
-          .find('textarea')
-          .attr('class', 'new-step-text')
-          .val(codeYourAdv.stepId.text);
-        
 
+        // .append('<input>')
+        //   .find('input')
+        //     .attr({'type':'checkbox', 'class': 'end', 'value': true})
+        //     .end()
 
-
-
-
-    // .append('<span>').addClass('step-id');
-      // .find('.step-id')
-      //   .text(codeYourAdv.stepId.step_id);
-      // .find('')
-      //   .text(codeYourAdv.stepId.step_id);
 
 
   },

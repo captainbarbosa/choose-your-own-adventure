@@ -7,6 +7,7 @@ require "bundler/setup"
 
 begin
   require "pry"
+  require "activerecord"
 rescue LoadError
 end
 

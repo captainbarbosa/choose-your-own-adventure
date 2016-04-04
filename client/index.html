@@ -69,10 +69,11 @@
                     </fieldset>
                 </form>
 
-                <h3>Current Steps</h3>
-                <ul>
+                <h3 id="currentSteps">Current Steps</h3>
+                <ul id="stepsList">
+                  <!-- <li id="newStep">this is my list</li> -->
                     <!-- example step
-                    <li>
+
                         <h4>Step ID: <span class='step-id'></span></h4>
                         <form class='edit-story-step'>
                             <input type='hidden' class='story-id' value=''>
@@ -90,7 +91,7 @@
                                     <input type='text' class='new-step-option-a-next'>
                                 </div>
                             </fieldset>
-                            <fieldset>
+                            <fieldset id="optionb">
                                 <div>
                                     <label for='new-step-option-b'>Option B</label>
                                     <input type='text' class='new-step-option-b'>
@@ -115,5 +116,7 @@
         <script src='test/test-mocks.js'></script>
         <script src='js/login.js'></script>
         <script src='js/new_adventure.js'></script>
+        <script src='js/new_step.js'></script>
+
     </body>
 </html>

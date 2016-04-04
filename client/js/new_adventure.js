@@ -11,7 +11,6 @@ var storyId = {};
     $('#create-story').css( "display", "block");
     $('nav').hide();
     console.log("hi");
-
   });
 
 // story name input event & ajax call to give name, get id
@@ -19,6 +18,7 @@ var storyId = {};
     event.preventDefault();
     var storyName = $('#new-story-name').val();
     console.log(storyName);
+
 
     $.ajax({
       url: '/new_adventure',
@@ -30,18 +30,22 @@ var storyId = {};
         authorization: codeYourAdv.userToken
       },
       success: function newStory (data){
-        storyId.id = data.id;
-        console.log(storyId);
-        console.log(storyName);
+        storyId = data;
+        $('#create-story').hide();
+        $('#edit-story').css("display", "block");
+        $('#currentSteps').hide();
+        $('.story-name').text(storyName);
+        codeYourAdv.storyId = storyId;
+        console.log(codeYourAdv.storyId);
+
       },
-// error function goes here, then display step creation
 
+        error: function new_adventureError (xhr){
+          console.error(xhr);
+      }
 
-      });
-
+    });
 
   });
-
-
 
 })(window.codeYourAdv);

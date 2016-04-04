@@ -27,6 +27,12 @@ if (window.location.search.match(/[^a-z]debug([^a-z]|$)/i)) {
       type: 'POST',             // This is the HTTP method for this action
       proxy: 'test/json/new_adventure.json'
     });
+    // Create a new step
+    $.mockjax({
+      url: '/new_step', // What should this be? Negotiate it!
+      type: 'POST',             // This is the HTTP method for this action
+      proxy: 'test/json/new_step.json'
+    });
     //
     //
     //
